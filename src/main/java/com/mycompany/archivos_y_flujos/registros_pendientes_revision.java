@@ -229,15 +229,100 @@ public class registros_pendientes_revision extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-        // TODO add your handling code here:
+        java.io.File archivo = new java.io.File("revisiones.txt");
+
+        if (!archivo.exists()) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "No existe el archivo revisiones.txt.");
+            return;
+        }
+
+        int confirmar = javax.swing.JOptionPane.showConfirmDialog(this,
+                "¿Deseas eliminar revisiones.txt? Se perderán los registros guardados.",
+                "Confirmar eliminación",
+                javax.swing.JOptionPane.YES_NO_OPTION,
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+
+        if (confirmar != javax.swing.JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        if (archivo.delete()) {
+            txtRegistros.setText("");
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "El archivo revisiones.txt se eliminó correctamente.");
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "No se pudo eliminar revisiones.txt.");
+        }
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnCrearCopiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCrearCopiaActionPerformed
-        // TODO add your handling code here:
+        java.io.File archivo = new java.io.File("revisiones.txt");
+        java.io.File copia = new java.io.File("revisiones_copia.txt");
+
+        if (!archivo.exists() || !archivo.isFile()) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "No existe el archivo revisiones.txt para copiar.");
+            return;
+        }
+
+        if (copia.exists()) {
+            int confirmar = javax.swing.JOptionPane.showConfirmDialog(this,
+                    "revisiones_copia.txt ya existe. ¿Deseas reemplazarlo?",
+                    "Confirmar copia",
+                    javax.swing.JOptionPane.YES_NO_OPTION,
+                    javax.swing.JOptionPane.QUESTION_MESSAGE);
+
+            if (confirmar != javax.swing.JOptionPane.YES_OPTION) {
+                return;
+            }
+        }
+
+        try {
+            java.nio.file.Files.copy(archivo.toPath(), copia.toPath(),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Se creó la copia revisiones_copia.txt correctamente.");
+        } catch (java.io.IOException e) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error al crear la copia: " + e.getMessage());
+        }
     }//GEN-LAST:event_btnCrearCopiaActionPerformed
 
     private void btnMoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMoverActionPerformed
-        // TODO add your handling code here:
+        java.io.File archivo = new java.io.File("revisiones.txt");
+        java.io.File destino = new java.io.File("revisiones_movido.txt");
+
+        if (!archivo.exists() || !archivo.isFile()) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "No existe el archivo revisiones.txt para mover.");
+            return;
+        }
+
+        if (destino.exists()) {
+            int confirmar = javax.swing.JOptionPane.showConfirmDialog(this,
+                    "revisiones_movido.txt ya existe. ¿Deseas reemplazarlo?",
+                    "Confirmar movimiento",
+                    javax.swing.JOptionPane.YES_NO_OPTION,
+                    javax.swing.JOptionPane.QUESTION_MESSAGE);
+
+            if (confirmar != javax.swing.JOptionPane.YES_OPTION) {
+                return;
+            }
+        }
+
+        try {
+            java.nio.file.Files.move(archivo.toPath(), destino.toPath(),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            txtRegistros.setText("El archivo se movió a revisiones_movido.txt.");
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "El archivo se movió correctamente. "
+                    + "Los botones de registros volverán a funcionar cuando exista revisiones.txt.");
+        } catch (java.io.IOException e) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error al mover el archivo: " + e.getMessage());
+        }
     }//GEN-LAST:event_btnMoverActionPerformed
 
     private void btnMarcarRevisadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMarcarRevisadoActionPerformed
@@ -325,7 +410,32 @@ try (java.util.Scanner lector = new java.util.Scanner(archivo)) {
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void btnContarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnContarActionPerformed
-        // TODO add your handling code here:
+        java.io.File archivo = new java.io.File("revisiones.txt");
+
+        if (!archivo.exists() || !archivo.isFile()) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "No existe el archivo revisiones.txt.");
+            return;
+        }
+
+        int cantidad = 0;
+
+        try (java.util.Scanner lector = new java.util.Scanner(archivo)) {
+            while (lector.hasNextLine()) {
+                String linea = lector.nextLine().trim();
+
+                if (linea.matches("\\d{4}\\|[A-Za-z0-9]{5}\\|[PR]")) {
+                    cantidad++;
+                }
+            }
+
+            txtRegistros.setText("Total de equipos registrados: " + cantidad);
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Total de equipos registrados: " + cantidad);
+        } catch (java.io.FileNotFoundException e) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "No existe el archivo revisiones.txt.");
+        }
     }//GEN-LAST:event_btnContarActionPerformed
 
     private void btnMostrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMostrarActionPerformed
